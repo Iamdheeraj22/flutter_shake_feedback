@@ -10,7 +10,6 @@ A production-ready Flutter package for detecting device shake gestures and trigg
 |---|---|
 | Package Name | flutter_shake_feedback |
 | Architecture | Clean Architecture |
-| State Management | Bloc/Cubit |
 | Platform Support | Android, iOS |
 | Flutter SDK | >=3.22.0 |
 | Dart SDK | >=3.0.0 |
@@ -145,10 +144,8 @@ lib/
 │   │   └── usecases/
 │   │
 │   ├── presentation/
-│   │   ├── cubit/
-│   │   │   ├── shake_feedback_cubit.dart
-│   │   │   ├── shake_feedback_state.dart
-│   │   │   └── shake_feedback_listener.dart
+│   │   ├── services/
+│   │   │   └── shake_feedback_service.dart
 │   │   │
 │   │   ├── widgets/
 │   │   │   ├── shake_feedback.dart
@@ -172,21 +169,15 @@ lib/
 
 ---
 
-# State Management (Cubit)
+# State Management (Service)
 
-The package should use Cubit because:
-
-- lightweight
-- scalable
-- reactive
-- easy testing
-- better stream handling
+The package should use a simple Service instead of Bloc/Cubit because the functionality is small and straightforward.
 
 ---
 
-# Cubit Responsibilities
+# Service Responsibilities
 
-## ShakeFeedbackCubit
+## ShakeFeedbackService
 
 Responsible for:
 
@@ -196,23 +187,6 @@ Responsible for:
 - Managing enable/disable state
 - Triggering feedback events
 
----
-
-# Cubit States
-
-```dart
-sealed class ShakeFeedbackState {}
-
-final class ShakeInitial extends ShakeFeedbackState {}
-
-final class ShakeListening extends ShakeFeedbackState {}
-
-final class ShakeDetected extends ShakeFeedbackState {}
-
-final class ShakeDisabled extends ShakeFeedbackState {}
-
-final class ShakeCooldown extends ShakeFeedbackState {}
-```
 
 ---
 
@@ -329,7 +303,7 @@ Main wrapper widget.
 
 Responsible for:
 
-- Providing Cubit
+- Providing Service
 - Listening shake states
 - Triggering callbacks
 - Wrapping child widget tree
@@ -400,7 +374,7 @@ Unit tests are mandatory.
 ---
 
 ## Presentation Layer
-- Cubit states
+- Service states
 - Widget behavior
 - Shake detection flow
 
