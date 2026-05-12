@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_shake_feedback/src/core/constants/shake_constants.dart';
 import 'package:flutter_shake_feedback/src/data/repositories/shake_repository_impl.dart';
-
-import 'package:flutter_shake_feedback/src/presentation/cubit/shake_feedback_cubit.dart';
-import 'package:flutter_shake_feedback/src/presentation/cubit/shake_feedback_state.dart';
+import 'package:flutter_shake_feedback/src/presentation/services/shake_feedback_service.dart';
 
 /// A widget that detects device shake gestures and triggers a callback.
 ///
-/// This widget wraps its [child] in a `BlocProvider` and listens for accelerometer
+/// This widget initializes the [ShakeFeedbackService] and listens for accelerometer
 /// events. When a shake is detected based on the configured [sensitivity],
 /// it executes the [onShake] callback.
 ///
@@ -22,7 +19,7 @@ import 'package:flutter_shake_feedback/src/presentation/cubit/shake_feedback_sta
 ///   child: const MyApp(),
 /// )
 /// ```
-class ShakeFeedback extends StatelessWidget {
+class ShakeFeedback extends StatefulWidget {
   /// The widget below this widget in the tree.
   ///
   /// Typically, you would wrap your entire `MaterialApp` or specific
@@ -71,90 +68,58 @@ class ShakeFeedback extends StatelessWidget {
     this.enabled = true,
   });
 
-  /// Builds the widget tree by providing the [ShakeFeedbackCubit] to its descendants.
-  ///
-  /// Initializes the cubit with the provided use cases and data sources,
-  /// and wraps the child with `_ShakeFeedbackListener` to handle state emissions.
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ShakeFeedbackCubit(
-        shakeRepository: ShakeRepositoryImpl(),
-        sensitivity: sensitivity,
-        cooldown: cooldown,
-        enabled: enabled,
-      ),
-      child: _ShakeFeedbackListener(
-        onShake: onShake,
-        enableHaptic: enableHaptic,
-        sensitivity: sensitivity,
-        cooldown: cooldown,
-        enabled: enabled,
-        child: child,
-      ),
+  State<ShakeFeedback> createState() => _ShakeFeedbackState();
+}
+
+class _ShakeFeedbackState extends State<ShakeFeedback> {
+  late final ShakeFeedbackService _shakeFeedbackService;
+
+  @override
+  void initState() {
+    super.initState();
+    _shakeFeedbackService = ShakeFeedbackService(
+      shakeRepository: ShakeRepositoryImpl(),
+      sensitivity: widget.sensitivity,
+      cooldown: widget.cooldown,
+      enabled: widget.enabled,
+      onShakeDetected: _handleShake,
     );
   }
-}
 
-/// An internal widget that listens to the [ShakeFeedbackCubit] and triggers
-/// the [onShake] callback when the [ShakeDetected] state is emitted.
-class _ShakeFeedbackListener extends StatefulWidget {
-  final Widget child;
-  final VoidCallback onShake;
-  final bool enableHaptic;
-  final ShakeSensitivity sensitivity;
-  final Duration cooldown;
-  final bool enabled;
+  void _handleShake() {
+    if (widget.enableHaptic) {
+      HapticFeedback.vibrate();
+    }
+    widget.onShake();
+  }
 
-  const _ShakeFeedbackListener({
-    required this.child,
-    required this.onShake,
-    required this.enableHaptic,
-    required this.sensitivity,
-    required this.cooldown,
-    required this.enabled,
-  });
-
-  @override
-  State<_ShakeFeedbackListener> createState() => _ShakeFeedbackListenerState();
-}
-
-class _ShakeFeedbackListenerState extends State<_ShakeFeedbackListener> {
   /// Called whenever the widget configuration changes.
   ///
-  /// Updates the underlying [ShakeFeedbackCubit] if the [sensitivity],
-  /// [cooldown], or [enabled] properties are modified, allowing dynamic
-  /// configuration changes without rebuilding the cubit state entirely.
+  /// Updates the underlying [ShakeFeedbackService] if the [sensitivity],
+  /// [cooldown], or [enabled] properties are modified.
   @override
-  void didUpdateWidget(covariant _ShakeFeedbackListener oldWidget) {
+  void didUpdateWidget(covariant ShakeFeedback oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.sensitivity != widget.sensitivity ||
         oldWidget.cooldown != widget.cooldown ||
         oldWidget.enabled != widget.enabled) {
-      context.read<ShakeFeedbackCubit>().updateConfiguration(
-            sensitivity: widget.sensitivity,
-            cooldown: widget.cooldown,
-            enabled: widget.enabled,
-          );
+      _shakeFeedbackService.updateConfiguration(
+        sensitivity: widget.sensitivity,
+        cooldown: widget.cooldown,
+        enabled: widget.enabled,
+      );
     }
   }
 
-  /// Builds the [BlocListener] that responds to state changes from the Cubit.
-  ///
-  /// Triggers [HapticFeedback.vibrate] (if enabled) and calls the [onShake]
-  /// callback whenever the [ShakeDetected] state is emitted by the cubit.
+  @override
+  void dispose() {
+    _shakeFeedbackService.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ShakeFeedbackCubit, ShakeFeedbackState>(
-      listener: (context, state) {
-        if (state is ShakeDetected) {
-          if (widget.enableHaptic) {
-            HapticFeedback.vibrate();
-          }
-          widget.onShake();
-        }
-      },
-      child: widget.child,
-    );
+    return widget.child;
   }
 }
