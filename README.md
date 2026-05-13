@@ -8,7 +8,6 @@ A highly robust, sequence-based shake detection package for Flutter, built using
 - **Configurable Sensitivity:** Choose from `low`, `medium`, or `high` sensitivity to match your target audience or physical device types.
 - **Configurable Cooldowns:** Built-in cooldown timers prevent users from spamming the shake trigger.
 - **Clean Architecture:** Implemented using isolated Data, Domain, and Presentation layers, making it highly testable and extensible.
-- **State Management Built-In:** Powered internally by `flutter_bloc`, seamlessly pushing states to your widgets.
 
 ## Getting started
 
