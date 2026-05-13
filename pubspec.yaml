@@ -1,6 +1,6 @@
 name: flutter_shake_feedback
 description: A production-ready Flutter package for detecting device shake gestures and triggering customizable feedback actions.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/Iamdheeraj22/flutter_shake_feedback
 repository: https://github.com/Iamdheeraj22/flutter_shake_feedback
 issue_tracker: https://github.com/Iamdheeraj22/flutter_shake_feedback/issues
