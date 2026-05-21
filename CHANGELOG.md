@@ -1,3 +1,5 @@
+## 1.0.2
+* **Example:** Add example of the IOS platform compability 
 ## 1.0.1
 
 * **Architecture Simplification:** Removed `flutter_bloc` (Cubit) state management and replaced it with a simpler, lightweight standalone `ShakeFeedbackService`.
