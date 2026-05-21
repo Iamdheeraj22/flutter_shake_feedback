@@ -15,7 +15,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_shake_feedback: ^1.0.0
+  flutter_shake_feedback: ^1.0.2
 ```
 
 ## Usage
