@@ -1,3 +1,8 @@
+## 1.0.3
+
+* **Maintenance:** Removed unused web and desktop platform support from the example project to optimize for mobile (Android & iOS).
+* **Cleanup:** Optimized analysis options and project metadata.
+
 ## 1.0.2
 * **Example:** Add example of the IOS platform compability 
 ## 1.0.1
